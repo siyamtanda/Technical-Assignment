@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>User Profile</h1>
+<p>Username: {{ user.username }}</p>
+<p>First Name: {{ user.first_name}}</p>
+<p>Last Name: {{ user.last_name }}</p>
+<p>Email: {{ user.email }}</p>
+<p>Home Address: {{ user.customuser.home_address }}</p>
+<p>Phone Number: {{ user.customuser.phone_number }}</p>
+<p>Location: {{ user.customuser.location }}</p>
+<a href="{% url 'user_update' %}">Edit Profile</a>
+{% endblock %}
+```
+
+`profiles/templates/profiles/customuser_update_form.html`:
+
+```
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Edit Profile</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <label for="latitude">Latitude:</label>
+    <input type="text" id="latitude" name="latitude" value="{{ object.location.y }}">
+    <label for="longitude">Longitude:</label>
+    <input type="text" id="longitude" name="longitude" value="{{ object.location.x }}">
+    <button type="submit">Save</button>
+</form>
+{% endblock %}
+```
+
+`profiles/templates/profiles/map.html`:
+
+```
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Map</h1>
+<div id="map" style="height: 500px;"></div>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/leaflet.js"></script>
+<script>
+    var map = L.map('map').setView([0, 0], 2);
+    var markers = L.layerGroup();
+    var url = "{% url 'map_view' %}";
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(user => {
+                if (user.location) {
+                    var marker = L.marker([user.location.coordinates[1], user.location.coordinates[0]])
+                        .bindPopup('<a href="#">' + user.username + '</a>');
+                    markers.addLayer(marker);
+                }
+            });
+            markers.addTo(map);
+            map.fitBounds(markers.getBounds());
+        });
+</script>
+{% endblock %}
+```
+
