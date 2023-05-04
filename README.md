@@ -1,7 +1,7 @@
 ##### Technical-Assignment
-###Geo-Spatial Application in Python
+Geo-Spatial Application in Python
 
-#Install Django:
+Install Django:
 
 pip install django
 
